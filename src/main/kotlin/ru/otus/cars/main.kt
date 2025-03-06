@@ -1,21 +1,26 @@
 package ru.otus.cars
 
+import kotlin.random.Random
+
 fun main() {
-    println("\n===> drive cars...")
-    driveCars()
-    println("\n===> inner test...")
-    innerNestedCheck()
-    println("\n===> garage make...")
-    garageMake()
-    println("\n===> model special...")
-    println("\n===> get equipment...")
-    getEquipment()
-    println("\n===> get color...")
-    getColor()
-    println("\n===> tech checks...")
-    techChecks()
-    println("\n===> Taz...")
-    println(Taz.color)
+    val vaz1 = Togliatti.buildCar(Vaz2107, Car.Plates("123", 77))
+    val vaz2 = Togliatti.buildCar(Vaz2108, Car.Plates("321", 78))
+    val gs = GasStation()
+
+
+    println("vaz1: в баке " + vaz1.carOutput.getFuelLevel() + " литров")
+    println("vaz2: в баке " + vaz2.carOutput.getFuelLevel() + " литров")
+    println("taz: в баке " + Taz.carOutput.getFuelLevel() + " литров")
+
+    gs.car = vaz1
+    gs.refuelingCar(20)
+    gs.car = vaz2
+    gs.refuelingCar(30)
+    gs.car = Taz
+    gs.refuelingCar(40)
+    println("vaz1: в баке " + vaz1.carOutput.getFuelLevel() + " литров")
+    println("vaz2: в баке " + vaz2.carOutput.getFuelLevel() + " литров")
+    println("taz: в баке " + Taz.carOutput.getFuelLevel() + " литров")
 }
 
 fun driveCars() {
@@ -89,5 +94,26 @@ fun repairEngine(car: VazPlatform) {
     when (car.engine) {
         is VazEngine.LADA_2107 -> println("Чистка карбюратора у двигателя объемом ${car.engine.volume} куб.см у машины $car")
         is VazEngine.SAMARA_2108 -> println("Угол зажигания у двигателя объемом ${car.engine.volume} куб.см у машины $car")
+    }
+}
+
+class GasStation {
+    var car : Car? = null
+    fun refuelingCar(liters : Int) : Unit {
+        try {
+            if (car != null) {
+                val mouth = car!!.tank.mouth
+                if (mouth != null) {
+                    mouth.open()
+                    when (mouth) {
+                        is PetrolMouth -> mouth.fuelPetrol(liters)
+                        is LpgMouth -> mouth.fuelLpg(liters)
+                    }
+                    mouth.close()
+                }
+            }
+        } catch(e : Error) {
+            println("Ошибка: ${e.message}")
+        }
     }
 }
